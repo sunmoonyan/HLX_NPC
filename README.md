@@ -6,5 +6,7 @@ Helix NPC adds a comprehensive NPC system. You can create your own presets in th
 ![preview](https://i.ibb.co/Hfgf8JpJ/Screenshot-from-2025-08-16-17-51-20.png)
 ![preview](https://i.ibb.co/XfTjwQwp/Screenshot-from-2025-08-16-17-52-30.png)
 
+join the discord for help or support : https://discord.gg/c9tse8PhE3
+
 # Next Feature For 1.1
 Add an in game editor to create simple text npc
