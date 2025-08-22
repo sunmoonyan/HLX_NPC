@@ -7,7 +7,8 @@ surface.CreateFont( "CloseCaption_Normal:50", {
   weight = 500,
   italic = false,
 } )
-    
+
+
     npcui_smoothpos = Vector(0, 0, 0)
     npcui_smoothang = Angle(0, 0, 0)
 

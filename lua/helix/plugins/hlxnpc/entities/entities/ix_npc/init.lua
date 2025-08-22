@@ -30,8 +30,9 @@ end
 
 function ENT:Use(Ply)
 
-Ply:InteractNPC(self:GetNpc())
 
+if HLXNPC[self:GetNpc()] == nil then return ix.util.Notify("Setup the NPC settings in proprieties", ply) end
+Ply:InteractNPC(self:GetNpc())
 net.Start("ix_npc_focus")
 net.WriteVector(self:LocalToWorld(Vector(25, 10, 65)))
 net.WriteAngle(self:LocalToWorldAngles(Angle(10, 170, 0)))
