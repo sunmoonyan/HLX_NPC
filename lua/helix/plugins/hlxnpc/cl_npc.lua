@@ -28,8 +28,8 @@ surface.CreateFont( "CloseCaption_Normal:50", {
         camang = net.ReadAngle()
         LocalPlayer():SetNoDraw(true)
         hook.Add("CalcView", "npc_focus", function(ply, pos, angles, fov)
-            npcui_smoothpos = LerpVector(0.01, npcui_smoothpos,campos)
-            npcui_smoothang = LerpAngle(0.01, npcui_smoothang,camang)
+            npcui_smoothpos = LerpVector(0.05, npcui_smoothpos,campos)
+            npcui_smoothang = LerpAngle(0.05, npcui_smoothang,camang)
             return {
                 origin = npcui_smoothpos,
                 angles = npcui_smoothang,
@@ -70,9 +70,9 @@ surface.CreateFont( "CloseCaption_Normal:50", {
         function NpcMenu:Paint(w, h)
 
             if intro == true && self.exit == false then
-                self.linecolor = Lerp(0.005, self.linecolor, 255)
+                self.linecolor = Lerp(0.02, self.linecolor, 255)
             elseif self.exit == true then
-                self.linecolor = Lerp(0.05, self.linecolor, 0)
+                self.linecolor = Lerp(0.125, self.linecolor, 0)
             else
                 self.linecolor = 255
             end
@@ -114,8 +114,8 @@ surface.CreateFont( "CloseCaption_Normal:50", {
                   NpcMenu.exit = true
 
                   hook.Add("CalcView", "npc_focus", function(ply, pos, angles, fov)
-                    npcui_smoothpos = LerpVector(0.01, npcui_smoothpos, LocalPlayer():EyePos())
-                    npcui_smoothang = LerpAngle(0.01, npcui_smoothang, LocalPlayer():GetAngles())
+                    npcui_smoothpos = LerpVector(0.025, npcui_smoothpos, LocalPlayer():EyePos())
+                    npcui_smoothang = LerpAngle(0.025, npcui_smoothang, LocalPlayer():GetAngles())
                    return {
                      origin = npcui_smoothpos,
                       angles = npcui_smoothang,
@@ -138,14 +138,14 @@ surface.CreateFont( "CloseCaption_Normal:50", {
             end
             function button:Paint(w, h)
                 if self:IsHovered() then
-                    self.colorAlpha = Lerp(0.01, self.colorAlpha, 255)
+                    self.colorAlpha = Lerp(0.05, self.colorAlpha, 255)
                 else
-                    self.colorAlpha = Lerp(0.1, self.colorAlpha, 0)
+                    self.colorAlpha = Lerp(0.25, self.colorAlpha, 0)
                 end
                 if NpcMenu.exit == false then
                     surface.SetDrawColor(self.buttoncolor.r, self.buttoncolor.g, self.buttoncolor.b, self.colorAlpha)
                 else
-                    surface.SetDrawColor(self.buttoncolor.r, self.buttoncolor.g, self.buttoncolor.b, NpcMenu.linecolor)
+                    surface.SetDrawColor(self.buttoncolor.r, self.buttoncolor.g, self.buttoncolor.b, 0)
                 end
                 if NpcMenu.exit then self:Remove() end
                 surface.SetMaterial(Material("vgui/gradient-l.png"))

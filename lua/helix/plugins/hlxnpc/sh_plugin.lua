@@ -29,7 +29,6 @@ if SERVER then
 
     function PLUGIN:SaveData()
         local data = {}
-        -----[Jobs]----
         for _, entity in ipairs(ents.FindByClass("ix_npc")) do
             local bodygroups = {}
             for _, v in ipairs(entity:GetBodyGroups() or {}) do
@@ -48,16 +47,13 @@ if SERVER then
             }
         end
         self:SetData(data)
-       -- HLXRP_PluginSaved("HLXNPC")
     end
 
 
 
 
     function PLUGIN:LoadData()
-      --  HLXRP_LoadingBar("HLXNPC")   
         for _, v in ipairs(self:GetData() or {}) do
-        -----[Jobs]----
          if v.ent == "ix_npc" then
             local entity = ents.Create("ix_npc")
             entity:SetPos(v.pos)
@@ -73,8 +69,6 @@ if SERVER then
             end
         end
        end
-
-      --  HLXRP_PluginLoaded("HLXNPC")
 
      end
 
