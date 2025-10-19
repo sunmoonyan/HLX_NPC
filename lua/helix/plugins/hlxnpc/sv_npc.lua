@@ -25,6 +25,7 @@ local player = FindMetaTable("Player")
       self:SendNPCDialogue(dialogue,npc,campos,camang)
       else
          if isfunction(HLXNPC[npc]["startdialogue"]) then
+         if HLXNPC[npc]["startdialogue"](self) == nil then return end
          self:SendNPCDialogue(HLXNPC[npc]["startdialogue"](self),npc,campos,camang)      
          else
          self:SendNPCDialogue(HLXNPC[npc]["startdialogue"],npc,campos,camang)   

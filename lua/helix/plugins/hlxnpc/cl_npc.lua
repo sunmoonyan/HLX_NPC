@@ -46,7 +46,6 @@ surface.CreateFont( "CloseCaption_Normal:50", {
         local letter = 0
         local smoothdesc = ""
 
-
         timer.Create("npcui_smoothdesc", 0.008, string.len(dialogue)+1, function()
             smoothdesc = string.sub(dialogue, 0, letter)
             letter = letter + 1
