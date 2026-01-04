@@ -32,11 +32,20 @@ function ENT:Use(Ply)
 
 
 if HLXNPC[self:GetNpc()] == nil then return ix.util.Notify("Setup the NPC settings in proprieties", ply) end
-Ply:InteractNPC(self:GetNpc())
+
+local startdialogue = nil 
 
 if isfunction(HLXNPC[self:GetNpc()]["startdialogue"]) then
-   if HLXNPC[self:GetNpc()]["startdialogue"](Ply) == nil then return end
+	startdialogue = HLXNPC[self:GetNpc()]["startdialogue"](Ply)
+   if startdialogue == nil then return end
+else
+	startdialogue = HLXNPC[self:GetNpc()]["startdialogue"]
+	if startdialogue == nil then return end
 end
+
+if HLXNPC[self:GetNpc()]["dialogue"][startdialogue]["condition"](Ply) == false then return end
+
+Ply:InteractNPC(self:GetNpc(),nil,self:GetDisplayName())
 
 net.Start("ix_npc_focus")
 net.WriteVector(self:LocalToWorld(Vector(25, 10, 65)))

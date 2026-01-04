@@ -20,29 +20,26 @@ local player = FindMetaTable("Player")
       end
    end
 
-   function player:InteractNPC(npc,dialogue)
+   function player:InteractNPC(npc,dialogue,name)
       if dialogue then
-      self:SendNPCDialogue(dialogue,npc,campos,camang)
+      self:SendNPCDialogue(npc,dialogue,name)
       else
          if isfunction(HLXNPC[npc]["startdialogue"]) then
          if HLXNPC[npc]["startdialogue"](self) == nil then return end
-         self:SendNPCDialogue(HLXNPC[npc]["startdialogue"](self),npc,campos,camang)      
+         self:SendNPCDialogue(npc,HLXNPC[npc]["startdialogue"](self),name)      
          else
-         self:SendNPCDialogue(HLXNPC[npc]["startdialogue"],npc,campos,camang)   
+         self:SendNPCDialogue(npc,HLXNPC[npc]["startdialogue"],name)   
          end
       end
    end
 
-   function player:SendNPCDialogue(dialogue,npc)
+   function player:SendNPCDialogue(npc,dialogue,name)
      local FDialogue = ""
      local FArgs = {}
      local FArgsButton = {}
      local FButton = {}
 
-     if HLXNPC[npc]["dialogue"][dialogue]["condition"](self) then else return end
-
      for i,v in ipairs(HLXNPC[npc]["dialogue"][dialogue]["args"]) do
-
         if isfunction(v) then
         FArgs[i] = v(self)
         else
@@ -74,6 +71,7 @@ local player = FindMetaTable("Player")
 
      net.Start("ix_npc_send") --Nom
      net.WriteString(npc) --npc
+     net.WriteString(name or "[noname]")--name
      net.WriteInt(dialogue, 6)
      net.WriteString(FDialogue) --Dialogue
      net.WriteTable(FButton) --Buttons

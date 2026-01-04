@@ -11,25 +11,33 @@ surface.CreateFont( "CloseCaption_Normal:50", {
 
     npcui_smoothpos = Vector(0, 0, 0)
     npcui_smoothang = Angle(0, 0, 0)
+    local cache_name = ""
 
     net.Receive("ix_npc_send", function() 
         if NpcMenu != nil && NpcMenu:IsValid() then
             NpcMenu:Remove() 
-            IXNPC_UI(net.ReadString(),net.ReadInt(6),net.ReadString(),net.ReadTable(),false)
+            IXNPC_UI(net.ReadString(),net.ReadString(),net.ReadInt(6),net.ReadString(),net.ReadTable(),false)
         else
-            IXNPC_UI(net.ReadString(),net.ReadInt(6),net.ReadString(),net.ReadTable(),true)
+            IXNPC_UI(net.ReadString(),net.ReadString(),net.ReadInt(6),net.ReadString(),net.ReadTable(),true)
         end
     end)
 
     net.Receive("ix_npc_focus", function()
         npcui_smoothpos = LocalPlayer():EyePos()
         npcui_smoothang = LocalPlayer():GetAngles()
+
         campos = net.ReadVector()
         camang = net.ReadAngle()
+
         LocalPlayer():SetNoDraw(true)
+
         hook.Add("CalcView", "npc_focus", function(ply, pos, angles, fov)
-            npcui_smoothpos = LerpVector(0.05, npcui_smoothpos,campos)
-            npcui_smoothang = LerpAngle(0.05, npcui_smoothang,camang)
+            local speed = 5 
+            local t = math.Clamp(FrameTime() * speed, 0, 1)
+
+            npcui_smoothpos = LerpVector(t, npcui_smoothpos, campos)
+            npcui_smoothang = LerpAngle(t, npcui_smoothang, camang)
+
             return {
                 origin = npcui_smoothpos,
                 angles = npcui_smoothang,
@@ -39,12 +47,15 @@ surface.CreateFont( "CloseCaption_Normal:50", {
         end)
     end)
 
-    function IXNPC_UI(name,dialogueindex,dialogue,buttons,intro)
+
+    function IXNPC_UI(npc,name,dialogueindex,dialogue,buttons,intro)
         local Xsize = ScrW()
         local Ysize = ScrH()
         local lines = 0
         local letter = 0
         local smoothdesc = ""
+
+        if name != "[noname]" then cache_name = name end
 
         timer.Create("npcui_smoothdesc", 0.008, string.len(dialogue)+1, function()
             smoothdesc = string.sub(dialogue, 0, letter)
@@ -80,7 +91,7 @@ surface.CreateFont( "CloseCaption_Normal:50", {
             surface.DrawLine(w * 0.6, h * 0.1, w * 0.6, h * 0.9)
             surface.DrawLine(w * 0.6, h * 0.2, w * 0.9, h * 0.2)
             
-            draw.DrawText(name, "CloseCaption_Normal:50", w * 0.61, h * 0.125, Color(255, 255, 225, self.linecolor), TEXT_ALIGN_LEFT)
+            draw.DrawText(cache_name, "CloseCaption_Normal:50", w * 0.61, h * 0.125, Color(255, 255, 225, self.linecolor), TEXT_ALIGN_LEFT)
 
 
                 draw.DrawText(smoothdesc, "Trebuchet18", w * 0.625, (h * (0.015) + h * 0.22), Color(255, 255, 255, self.linecolor), TEXT_ALIGN_LEFT)
@@ -104,7 +115,7 @@ surface.CreateFont( "CloseCaption_Normal:50", {
                 LocalPlayer():EmitSound("Helix.Whoosh")
 
                 net.Start("ix_npc_callback")
-                net.WriteString(name)
+                net.WriteString(npc)
                 net.WriteInt(dialogueindex, 6)
                 net.WriteInt(i, 4)
                 net.SendToServer()
