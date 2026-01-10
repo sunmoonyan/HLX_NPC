@@ -6,8 +6,6 @@ HLXNPC["template"] = {
         return 1
     end,
 
-    sequence = "idle_all_01",
-
     onTakeDamage = function(ent)
 
     end,
@@ -22,8 +20,6 @@ HLXNPC["template"] = {
             ["Condition"] = function(ply, ent)
                 return true
             end,            
-            ["Sound"] = "",
-            ["Sequence"] = "",
             ["Answers"] = {
 
                 [1] = {
@@ -56,8 +52,6 @@ HLXNPC["gun_dealer"] = {
         return 1
     end,
 
-    sequence = "idle_all_01",
-
     onTakeDamage = function(ent)
 
     end,
@@ -72,8 +66,6 @@ HLXNPC["gun_dealer"] = {
             ["Condition"] = function(ply, ent)
                 return true
             end,            
-            ["Sound"] = "",
-            ["Sequence"] = "",
             ["Answers"] = {
 
                 [1] = {
@@ -121,8 +113,6 @@ HLXNPC["grocery"] = {
         return 1
     end,
 
-    sequence = "idle_all_01",
-
     onTakeDamage = function(ent)
         ent:PlayNPCAnimation("idle_all_cower",5)
         ent:EmitSound("ambient/voices/m_scream1.wav")
@@ -138,8 +128,6 @@ HLXNPC["grocery"] = {
             ["Condition"] = function(ply, ent)
                 return true
             end,            
-            ["Sound"] = "",
-            ["Sequence"] = "",
             ["Answers"] = {
 
                 [1] = {
@@ -194,8 +182,6 @@ HLXNPC["grocery"] = {
             ["Condition"] = function(ply, ent)
                 return true
             end,            
-            ["Sound"] = "",
-            ["Sequence"] = "",
             ["Answers"] = {
                 [1] = {
                     ["Condition"] = function(ply, ent)

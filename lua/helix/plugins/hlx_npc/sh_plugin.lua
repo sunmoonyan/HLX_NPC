@@ -44,6 +44,7 @@ AddCSLuaFile("cl_npc.lua")
               bodygroups = bodygroups,
               npc = entity:GetNpc(),
               ent = "ix_npc",
+              idlesequence = entity:GetIdleSequence(),
           }
       end
       self:SetData(data)
@@ -64,20 +65,9 @@ AddCSLuaFile("cl_npc.lua")
           entity:SetDisplayName(v.name)
           entity:SetDescription(v.description)
           entity:SetNpc(v.npc)
+          entity:SetIdleSequence(v.idlesequence)
           for id, bodygroup in pairs(v.bodygroups or {}) do
               entity:SetBodygroup(id, bodygroup)
-          end
-
-          local npcid = entity:GetNpc()
-          local npctable = HLXNPC[npcid] or nil
-          local idlesequence = npctable.sequence
-          if idlesequence then
-              local seq = entity:LookupSequence(idlesequence)
-              if seq > 0 then
-                  entity:ResetSequence(seq)
-                  entity:SetCycle(0)
-                  entity:SetPlaybackRate(1)
-              end
           end
 
       end

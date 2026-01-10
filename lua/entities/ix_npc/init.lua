@@ -12,6 +12,7 @@ function ENT:Initialize()
 	self:SetUseType( SIMPLE_USE ) 
 	self:DropToFloor()
     self:SetTrigger(true)
+	self:SetIdleSequence(2) 
 end
 
 
@@ -41,6 +42,7 @@ end
 function ENT:OnTakeDamage()
    	local npcid = self:GetNpc()
    	local npctable = HLXNPC[npcid] or nil 
+   	if npctable == nil then return end
     npctable.onTakeDamage(self)
 end
 
@@ -50,13 +52,11 @@ function ENT:PlayNPCAnimation(sequence,time)
 
     local seq = self:LookupSequence(sequence)
     local duration = time or self:SequenceDuration( seq )
-    local idlesequence = npctable.sequence
-
     if seq and seq > 0 then
         self:ResetSequence(seq)
         self:SetCycle(0)
         self:SetPlaybackRate(1)
-        timer.Create("reset_"..self:EntIndex().."_anim", duration, 1, function() self:ResetSequence(self:LookupSequence(idlesequence)) end)
+        timer.Create("reset_"..self:EntIndex().."_anim", duration, 1, function() self:ResetSequence(self:LookupSequence(self:GetIdleSequence())) end)
     end
 end
 
