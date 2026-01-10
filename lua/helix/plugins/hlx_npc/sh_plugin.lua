@@ -15,71 +15,80 @@ local PLUGIN = PLUGIN
 
 PLUGIN.name = "Helix NPC"
 PLUGIN.author = "Sunshi"
-PLUGIN.description = "."
+PLUGIN.description = "Helix NPC V2.0"
 
 
 
 if SERVER then
- AddCSLuaFile("hlxnpc_config.lua")
- AddCSLuaFile("cl_npc.lua")
- include("sv_npc.lua")
- include("hlxnpc_config.lua")
+
+HLXNPC = {}
+
+include("sv_npc.lua")
+include("hlx_npc.lua")
+AddCSLuaFile("cl_npc.lua")
+
+  function PLUGIN:SaveData()
+      local data = {}
+      for _, entity in ipairs(ents.FindByClass("ix_npc")) do
+          local bodygroups = {}
+          for _, v in ipairs(entity:GetBodyGroups() or {}) do
+              bodygroups[v.id] = entity:GetBodygroup(v.id)
+          end
+          data[#data + 1] = {
+              name = entity:GetDisplayName(),
+              description = entity:GetDescription(),
+              pos = entity:GetPos(),
+              angles = entity:GetAngles(),
+              model = entity:GetModel(),
+              skin = entity:GetSkin(),
+              bodygroups = bodygroups,
+              npc = entity:GetNpc(),
+              ent = "ix_npc",
+          }
+      end
+      self:SetData(data)
+  end
 
 
 
-    function PLUGIN:SaveData()
-        local data = {}
-        for _, entity in ipairs(ents.FindByClass("ix_npc")) do
-            local bodygroups = {}
-            for _, v in ipairs(entity:GetBodyGroups() or {}) do
-                bodygroups[v.id] = entity:GetBodygroup(v.id)
-            end
-            data[#data + 1] = {
-                name = entity:GetDisplayName(),
-                description = entity:GetDescription(),
-                pos = entity:GetPos(),
-                angles = entity:GetAngles(),
-                model = entity:GetModel(),
-                skin = entity:GetSkin(),
-                bodygroups = bodygroups,
-                npc = entity:GetNpc(),
-                ent = "ix_npc",
-            }
-        end
-        self:SetData(data)
-    end
 
+  function PLUGIN:LoadData()
+      for _, v in ipairs(self:GetData() or {}) do
+       if v.ent == "ix_npc" then
+          local entity = ents.Create("ix_npc")
+          entity:SetPos(v.pos)
+          entity:SetAngles(v.angles)
+          entity:Spawn()
+          entity:SetModel(v.model)
+          entity:SetSkin(v.skin or 0)
+          entity:SetDisplayName(v.name)
+          entity:SetDescription(v.description)
+          entity:SetNpc(v.npc)
+          for id, bodygroup in pairs(v.bodygroups or {}) do
+              entity:SetBodygroup(id, bodygroup)
+          end
 
+          local npcid = entity:GetNpc()
+          local npctable = HLXNPC[npcid] or nil
+          local idlesequence = npctable.sequence
+          if idlesequence then
+              local seq = entity:LookupSequence(idlesequence)
+              if seq > 0 then
+                  entity:ResetSequence(seq)
+                  entity:SetCycle(0)
+                  entity:SetPlaybackRate(1)
+              end
+          end
 
-
-    function PLUGIN:LoadData()
-        for _, v in ipairs(self:GetData() or {}) do
-         if v.ent == "ix_npc" then
-            local entity = ents.Create("ix_npc")
-            entity:SetPos(v.pos)
-            entity:SetAngles(v.angles)
-            entity:Spawn()
-            entity:SetModel(v.model)
-            entity:SetSkin(v.skin or 0)
-            entity:SetDisplayName(v.name)
-            entity:SetDescription(v.description)
-            entity:SetNpc(v.npc)
-            for id, bodygroup in pairs(v.bodygroups or {}) do
-                entity:SetBodygroup(id, bodygroup)
-            end
-        end
-       end
-
+      end
      end
 
+   end
 
-
-
-
- 
 else
- IncludeCS("cl_npc.lua")
- IncludeCS("hlxnpc_config.lua")
+
+include("cl_npc.lua")
+
 end
 
 

@@ -1,95 +1,79 @@
-util.AddNetworkString("ix_npc_send")
+util.AddNetworkString("ix_npc_open")
+util.AddNetworkString("ix_npc_close")
 util.AddNetworkString("ix_npc_callback")
-util.AddNetworkString("ix_npc_focus")
+
 
 local player = FindMetaTable("Player")
 
+function player:InteractNPC(ent)
 
-   hook.Add("PlayerInitialSpawn", "HLXNPC_InitDialogueVar", function(ply)
-      ply.hlxnpc_var = {}
-   end)
+   if !ent:IsNearPlayer(self) then return end
+
+   local npcid = ent:GetNpc()
+   local npctable = HLXNPC[npcid] or nil 
+
+   if npctable == nil then return end
+
+   local startdialog = npctable["startdialog"](self,ent)
+   if startdialog == nil then return end
+
+   self:OpenNPCDialog(ent,startdialog) 
+
+end
 
 
-   function player:IsNearNPC(npc)
-      for i,v in ipairs(ents.FindInBox(self:GetPos()-Vector(100,100,100), self:GetPos()+Vector(100,100,100))) do
-         if v:GetClass() == "ix_npc" then 
-            if v:GetNpc() == npc then
-               return true
-            end
-         end
+function player:OpenNPCDialog(ent,dialogID)
+
+   local name = ent:GetDisplayName()
+
+   local npcid = ent:GetNpc()
+   local npctable = HLXNPC[npcid] or nil 
+   local dialog = npctable["dialogs"][dialogID]
+
+   if (!dialog["Condition"](self,ent)) then return end
+
+   local text = dialog["Text"]
+   local textargs = dialog["Args"](self,ent)
+   local formatedText = ""
+
+   formatedText = string.format(text,unpack( textargs ))  
+
+   local answers = dialog["Answers"]
+   local formatedAnswers = {}
+
+   for i,v in ipairs(answers) do
+      if v["Condition"](self,ent) then 
+      formatedAnswers[i] = string.format(v["Text"],unpack(v["Args"](self,ent)))  
       end
    end
 
-   function player:InteractNPC(npc,dialogue,name)
-      if dialogue then
-      self:SendNPCDialogue(npc,dialogue,name)
-      else
-         if isfunction(HLXNPC[npc]["startdialogue"]) then
-         if HLXNPC[npc]["startdialogue"](self) == nil then return end
-         self:SendNPCDialogue(npc,HLXNPC[npc]["startdialogue"](self),name)      
-         else
-         self:SendNPCDialogue(npc,HLXNPC[npc]["startdialogue"],name)   
-         end
-      end
+   net.Start("ix_npc_open")
+   net.WriteString(name)
+   net.WriteInt(dialogID, 9)
+   net.WriteString(formatedText)
+   net.WriteTable(formatedAnswers)
+   net.WriteEntity(ent)
+   net.Send(self)
+
+end
+
+function player:CloseNPCDialog()
+   net.Start("ix_npc_close")
+   net.Send(self)
+end
+
+net.Receive("ix_npc_callback", function(len,ply) 
+   local ent = net.ReadEntity()
+   local dialogID = net.ReadInt(9)
+   local answersID = net.ReadInt(4)
+
+   local dialog = HLXNPC[ent:GetNpc()]["dialogs"][dialogID]
+   local answer = dialog["Answers"][answersID]
+
+   if ent:IsNearPlayer(ply) && dialog["Condition"](ply,ent) && answer["Condition"](ply,ent) then 
+      answer["CallBack"](ply,ent)
+   else
+      ply:CloseNPCDialog()
    end
-
-   function player:SendNPCDialogue(npc,dialogue,name)
-     local FDialogue = ""
-     local FArgs = {}
-     local FArgsButton = {}
-     local FButton = {}
-
-     for i,v in ipairs(HLXNPC[npc]["dialogue"][dialogue]["args"]) do
-        if isfunction(v) then
-        FArgs[i] = v(self)
-        else
-        FArgs[i] = v
-        end
-     end
-     
-     for i,v in ipairs(HLXNPC[npc]["dialogue"][dialogue]["buttons"]) do
-        if isfunction(v["condition"]) then
-          if  v["condition"](self) then  
-            FArgsButton[i] = {}
-
-            for n,m in ipairs(v["args"]) do
-               FArgsButton[i][n] = {}
-               if isfunction(m) then
-              FArgsButton[i][n] = m(self)
-              else
-              FArgsButton[i][n] = m
-              end
-            end
-   
-          FButton[i] = {string.format(v["text"], unpack( FArgsButton[i] ) ), v["closedialogue"] }
-          end
-        end
-
-     end
-
-     FDialogue = string.format(HLXNPC[npc]["dialogue"][dialogue]["text"], unpack( FArgs ) )  
-
-     net.Start("ix_npc_send") --Nom
-     net.WriteString(npc) --npc
-     net.WriteString(name or "[noname]")--name
-     net.WriteInt(dialogue, 6)
-     net.WriteString(FDialogue) --Dialogue
-     net.WriteTable(FButton) --Buttons
-     net.Send(self)
-
-   end
-
-
-   net.Receive("ix_npc_callback", function(len,ply) 
-   local npc = net.ReadString()
-   local dialogue = net.ReadInt(6)
-   local button = net.ReadInt(4)
-
-   if ply:IsNearNPC(npc) && HLXNPC[npc]["dialogue"][dialogue]["buttons"][button]["condition"](ply) then
-   
-     HLXNPC[npc]["dialogue"][dialogue]["buttons"][button]["callback"](ply)
-
-   end
-
-   end)
+end)
 

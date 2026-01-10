@@ -1,4 +1,4 @@
-include("shared.lua") -- On inclue le fichier shared.lua pour le mettre en lien avec le cl_init.lua (je vous expliquerais tout cela).
+include("shared.lua")
 
 
     ENT.PopulateEntityInfo = true
