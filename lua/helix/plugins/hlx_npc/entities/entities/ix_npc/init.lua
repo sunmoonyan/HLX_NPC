@@ -56,7 +56,7 @@ function ENT:PlayNPCAnimation(sequence,time)
         self:ResetSequence(seq)
         self:SetCycle(0)
         self:SetPlaybackRate(1)
-        timer.Create("reset_"..self:EntIndex().."_anim", duration, 1, function() self:ResetSequence(self:LookupSequence(self:GetIdleSequence())) end)
+        timer.Create("reset_"..self:EntIndex().."_anim", duration, 1, function() self:ResetSequence(self:GetIdleSequence()) end)
     end
 end
 
