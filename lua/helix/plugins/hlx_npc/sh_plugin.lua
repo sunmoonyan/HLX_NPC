@@ -45,6 +45,7 @@ AddCSLuaFile("cl_npc.lua")
               npc = entity:GetNpc(),
               ent = "ix_npc",
               idlesequence = entity:GetIdleSequence(),
+              npcvar = entity.npcvar or {},
           }
       end
       self:SetData(data)
@@ -69,7 +70,7 @@ AddCSLuaFile("cl_npc.lua")
           for id, bodygroup in pairs(v.bodygroups or {}) do
               entity:SetBodygroup(id, bodygroup)
           end
-
+          entity.npcvar = v.npcvar or {}
       end
      end
 

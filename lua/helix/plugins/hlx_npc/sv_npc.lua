@@ -65,7 +65,7 @@ end
 net.Receive("ix_npc_callback", function(len,ply) 
    local ent = net.ReadEntity()
    local dialogID = net.ReadInt(9)
-   local answersID = net.ReadInt(4)
+   local answersID = net.ReadInt(5)
 
    local dialog = HLXNPC[ent:GetNpc()]["dialogs"][dialogID]
    local answer = dialog["Answers"][answersID]

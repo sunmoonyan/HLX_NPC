@@ -6,6 +6,15 @@ surface.CreateFont( "CloseCaption_Normal:50", {
   italic = false,
 } )
 
+surface.CreateFont("ixMenuButtonBigLabelFont", {
+    font = "Roboto Th",
+    size = ScreenScale(15),
+    extended = true,
+    weight = 100
+})
+
+ix_npcui = false
+
 net.Receive("ix_npc_open", function() 
     NPC_UI(net.ReadString(),net.ReadInt(9),net.ReadString(),net.ReadTable(),net.ReadEntity())
 end)
@@ -16,6 +25,7 @@ net.Receive("ix_npc_close", function()
             if IsValid(NpcMenu) then
 
                 NpcMenu:Remove()
+                ix_npcui = false
                 timer.Stop("npc_smoothdesc")
                 timer.Create("npc_force_close_focus", 0.75, 1, function() 
                     hook.Remove("CalcView", "npc_focus")
@@ -91,7 +101,10 @@ function NPC_UI(name,dialogID,text,answers,ent)
         NpcMenu:ShowCloseButton(false)
         NpcMenu:SetAlpha(0)
         NpcMenu:AlphaTo(255, 0.3, 0)
-
+        ix_npcui = true
+        function NpcMenu:OnClose()
+            ix_npcui = false
+        end
         function NpcMenu:Paint(w, h)
 
             surface.SetDrawColor(255, 255, 255, 255)
@@ -100,7 +113,6 @@ function NPC_UI(name,dialogID,text,answers,ent)
                 
             draw.DrawText(name, "CloseCaption_Normal:50", w * 0.61, h * 0.125, Color(255, 255, 225, 255), TEXT_ALIGN_LEFT)
             draw.DrawText(smoothtext, "Trebuchet18", w * 0.625, (h * (0.015) + h * 0.22), Color(255, 255, 255, 255), TEXT_ALIGN_LEFT)
-
         end
 
         timer.Stop("npc_force_close_focus")
@@ -144,7 +156,7 @@ function NPC_UI(name,dialogID,text,answers,ent)
             net.Start("ix_npc_callback")
             net.WriteEntity(ent)
             net.WriteInt(dialogID, 9)
-            net.WriteInt(i, 4)
+            net.WriteInt(i, 5)
             net.SendToServer()
         end
 
