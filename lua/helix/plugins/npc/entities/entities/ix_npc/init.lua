@@ -13,6 +13,9 @@ function ENT:Initialize()
 	self:DropToFloor()
     self:SetTrigger(true)
 	self:SetIdleSequence(2) 
+
+
+
 end
 
 
@@ -35,6 +38,24 @@ function ENT:Think()
 end
 
 function ENT:Use(Ply)
+    if not IsValid(self) then return end
+
+
+    local yawMin, yawMax = self:GetPoseParameterRange("head_yaw")
+    local pitchMin, pitchMax = self:GetPoseParameterRange("head_pitch")
+
+    if yawMax != nil then
+	    local yawCenter = (yawMax + yawMin) / 2
+	    local yawRange = (yawMax - yawMin) / 2
+	    local pitchCenter = (pitchMax + pitchMin) / 2
+
+	    local yawOffset = yawRange * 0.3  
+	    local pitchOffset = 0             
+
+	    self:SetPoseParameter("head_yaw", yawCenter + yawOffset)
+	    self:SetPoseParameter("head_pitch", pitchCenter + pitchOffset)
+	end
+
 	Ply:InteractNPC(self)
 end
 
@@ -68,4 +89,26 @@ function ENT:IsNearPlayer(player,distance)
         end
     end
     return false
+end
+
+
+function ENT:NewNpcInventory()
+    local invUniqueID = "ixnpcinv_:" .. self:EntIndex()
+    ix.inventory.New(nil, invUniqueID, function(inventory)
+        inventory:SetSize(5, 5)
+        inventory:SetShouldSave(false)
+        self.inv = inventory
+    end)
+end
+function ENT:GetNpcInventory()
+	return	ix.item.inventories[self.inv:GetID()]
+end
+function ENT:OpenNpcInventory(ply)
+    ix.storage.Open(ply,self:GetNpcInventory(), {
+        name = self:GetDisplayName(),
+        entity = self,
+        bMultipleUsers = false,
+        OnPlayerClose = function(ply)
+        end
+    })
 end

@@ -15,7 +15,8 @@ local PLUGIN = PLUGIN
 
 PLUGIN.name = "Helix NPC"
 PLUGIN.author = "Sunshi"
-PLUGIN.description = "Helix NPC V2.0"
+PLUGIN.description = "Helix NPC V2.1"
+
 
 
 
@@ -46,6 +47,9 @@ AddCSLuaFile("cl_npc.lua")
               ent = "ix_npc",
               idlesequence = entity:GetIdleSequence(),
               npcvar = entity.npcvar or {},
+              camOffsetX = entity:GetCamOffsetX(),
+              camOffsetY = entity:GetCamOffsetY(),
+              camOffsetZ = entity:GetCamOffsetZ()
           }
       end
       self:SetData(data)
@@ -55,6 +59,10 @@ AddCSLuaFile("cl_npc.lua")
 
 
   function PLUGIN:LoadData()
+      if self.LoadCustomNPCData then
+          self:LoadCustomNPCData()
+      end
+
       for _, v in ipairs(self:GetData() or {}) do
        if v.ent == "ix_npc" then
           local entity = ents.Create("ix_npc")
@@ -71,10 +79,14 @@ AddCSLuaFile("cl_npc.lua")
               entity:SetBodygroup(id, bodygroup)
           end
           entity.npcvar = v.npcvar or {}
+          entity:SetCamOffsetX(v.camOffsetX)
+          entity:SetCamOffsetY(v.camOffsetY)
+          entity:SetCamOffsetZ(v.camOffsetZ)
       end
      end
 
    end
+
 
 else
 
@@ -83,7 +95,29 @@ include("cl_npc.lua")
 end
 
 
+ix.command.Add("NPCEditor", {
+   description = "Open simple NPC dialog editor.",
+   adminOnly = true,
+   OnRun = function(self, client)
+      if SERVER then
+      net.Start("ix_npc_editor_open")
+      net.WriteTable(PLUGIN.customNPCData or {})
+      net.Send(client)
+      end
+   end
+})
 
+ix.command.Add("NPCDialogs", {
+   description = "Open NPC dialog browser.",
+   adminOnly = true,
+   OnRun = function(self, client)
+     if SERVER then
+      net.Start("ix_npc_dialog_browser_open")
+      net.WriteTable(buildDialogBrowserData())
+      net.Send(client)
+  end
+   end
+})
 
 properties.Add("npc_sequences", {
     MenuLabel = "Sequences List",
@@ -195,4 +229,3 @@ properties.Add("npc_sequences", {
         ent:SetIdleSequence(id)
     end
 })
-

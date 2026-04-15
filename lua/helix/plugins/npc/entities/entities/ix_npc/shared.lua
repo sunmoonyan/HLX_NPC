@@ -21,7 +21,32 @@ function ENT:SetupDataTables()
             category = "General"
         }
     })
+    self:NetworkVar("Int", 5, "CamOffsetZ", {
+        KeyName = "CamOffsetZ",
+        Edit = {
+            type = "Number",
+            order = 8,
+            category = "Camera"
+        }
+    })
 
+    self:NetworkVar("Int", 6, "CamOffsetY", {
+        KeyName = "CamOffsetY",
+        Edit = {
+            type = "Number",
+            order = 7,
+            category = "Camera"
+        }
+    })
+
+    self:NetworkVar("Int", 7, "CamOffsetX", {
+        KeyName = "CamOffsetX",
+        Edit = {
+            type = "Number",
+            order = 6,
+            category = "Camera"
+        }
+    })
     -- Appelé automatiquement quand IdleSequence change
     self:NetworkVarNotify("IdleSequence", function(ent, name, old, new)
         if not IsValid(ent) then return end
